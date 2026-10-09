@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fan-out Capture</title>
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<header>
+  <h1>Fan-out Capture</h1>
+  <div class="tools">
+    <label class="check"><input type="checkbox" id="onlySearch" checked> Only answers that searched</label>
+    <label class="btn">Open saved stream<input type="file" id="file" accept=".txt,.json,.har,.log" hidden></label>
+    <button id="clear" class="btn quiet">Clear all</button>
+  </div>
+</header>
+<nav id="list" aria-label="Captured answers"></nav>
+<main id="detail"><p class="empty">Ask a question that needs a web search in ChatGPT, Perplexity, Gemini, Claude or Grok. Captures appear here when the answer finishes.</p></main>
+<script type="module" src="panel.js"></script>
+</body>
+</html>
