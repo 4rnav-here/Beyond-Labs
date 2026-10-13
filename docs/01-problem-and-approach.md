@@ -11,6 +11,8 @@ When ChatGPT answers a question using web search, you only see the final answer.
 
 The key idea from the task brief is **"Retrieved is not the same as Cited."** ChatGPT pulls in more pages than it credits.
 
+Reading that data is the practical half of the problem. The other half is understanding it. Once I could see the queries, the obvious next questions were why the model wrote them that way, where the brand names in them came from, and whether the snapshots were cached copies. The capture cannot answer those, so this project also tries to explain the system behind it. That explanation is in [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md).
+
 The task has three parts:
 
 1. **Task 1.** Capture the network stream for one prompt and extract the citation snapshot for each source: URL, title, snippet and any metadata.
@@ -33,7 +35,7 @@ The video never opens the Network tab itself, so it does not show which request 
 
 ## How I went about it
 
-I did all of this in one evening, so I had to be practical. I did not take the time to understand every network call and every internal tool. I read enough to understand the flow, and then built something simple on top of it.
+I did the capture work in one evening, so I had to be practical. I did not take the time to understand every network call and every internal tool. I read enough to understand the flow, and then built something simple on top of it. The deeper research on learning, memory and caching came afterwards, once the captures had given me specific questions to ask (step 11).
 
 I used ChatGPT and Claude as research and coding assistants throughout. I say where below.
 
@@ -47,13 +49,13 @@ The answer was correct but pointed the wrong way for this task. It was about:
 - OpenAI's official API, which can return a trace of the search,
 - tools for recording what an AI application does, such as Langfuse.
 
-Useful background, but none of it shows what the ChatGPT app itself sends to the browser. I kept the API idea for the scaling plan in [07-scaling.md](07-scaling.md).
+Useful background, but none of it shows what the ChatGPT app itself sends to the browser. I kept the API idea as a later comparison. It is in the next steps in [08-limits-and-next-steps.md](08-limits-and-next-steps.md).
 
 ### Step 2: narrowing to retrieval
 
 I told it I only cared about the fan-out queries and the retrieval side, not how the answer is written.
 
-That gave me the vocabulary I needed: query decomposition, query expansion, multi-query retrieval with rank fusion, metasearch, and iterative retrieval. These are in [02-research-notes.md](02-research-notes.md#background-what-fan-out-means-technically). It also gave me a list of what a good search trace should record, which I reuse in the scaling plan.
+That gave me the vocabulary I needed: query decomposition, query expansion, multi-query retrieval with rank fusion, metasearch, and iterative retrieval. These are in [02-research-notes.md](02-research-notes.md#background-what-fan-out-means-technically). It also gave me a list of what a good search trace should record: the prompt, the queries, the results, the pages opened and the citations.
 
 ### Step 3: asking about the two snapshots
 
@@ -97,19 +99,35 @@ With the extension working, I ran two more ChatGPT prompts and one Gemini prompt
 
 The new captures showed three problems in the parser, which I fixed. They also showed that two things I believed after the first run were wrong. Both are listed in [08-limits-and-next-steps.md](08-limits-and-next-steps.md#mistakes-i-made-along-the-way).
 
+### Step 11: going back to ask why
+
+By now I had the data, and it raised questions the data could not answer.
+
+- Every query contained Featherlite and Green Soul. I had not typed them and no search had run yet. Where did they come from?
+- In a later attempt, "Best chairs under 15k" produced two queries instead of one, and the second one named a product, Zodiac Pro, that was not in the first. Why two, and where did the new name come from?
+- The same pages kept returning the same snapshots. Was ChatGPT caching them? And is that what people mean when they say it "caches"?
+
+I put these to ChatGPT as a research question. The useful thing about its answer was that it kept three kinds of claim apart: what OpenAI documents, what outside researchers have measured, and what is only a reasonable guess. An assistant can cite a page loosely, so the main sources were opened and checked before I relied on them. Three could be confirmed directly. The rest are marked as not re-checked in [09-references.md](09-references.md).
+
+The main thing I took from it is that "learning", "memory", "search" and "cache" are four separate mechanisms. I had been treating them as one. The brand names are a learning question. "India" appearing in run 1 is a memory question. The repeated snapshots are a search-cache question. And the cache that OpenAI documents in most detail, the prompt cache, answers none of them.
+
+This is written up in [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md).
+
 ## Choices I made
 
 **Keep the first version simple.** I did not want to build a complicated system before I understood the data. That would only have added confusion. One hook, one parser file, no build step, no libraries.
 
 **Focus on three platforms first.** ChatGPT, Gemini and Claude. Perplexity and Grok are covered from reading only.
 
-**An extension instead of a scraper.** A browser extension reads my own session in my own browser. It does not need to get past bot detection, and it works on any assistant I am logged in to. A scripted browser would have spent most of the evening fighting Cloudflare. The scripted route is the right one for scale, and I describe it in [07-scaling.md](07-scaling.md).
+**An extension instead of a scraper.** A browser extension reads my own session in my own browser. It does not need to get past bot detection, and it works on any assistant I am logged in to. A scripted browser would have spent most of the evening fighting Cloudflare. The scripted route is the right one for running many prompts, and it is on the list of next steps.
 
 **Always keep the raw response.** ChatGPT changed its response format several times between July and October 2026. If the raw text is saved, a parser fix can be re-run on old captures.
 
 **Search by field name, not position.** The parser walks the whole response looking for known field names. Fields get moved around often, and this survives that.
 
 **Say what I did not verify.** Where something comes only from someone else's write-up, or where a reader in the extension is untested, the docs say so.
+
+**Keep observed and explained apart.** What I captured is one thing. Why it happened is another, and for that I depend on documentation and other people's studies. The results page sticks to what I saw. The explanation page says, claim by claim, how well supported it is.
 
 ## About the two snapshot sizes
 
@@ -118,3 +136,5 @@ I tried to understand the 150 to 200 character and 1,000 character snapshots fro
 What I did find were third-party posts that measured two different search back ends with different snippet lengths: about 153 characters on one and about 1,100 to 1,200 on the other. So the two sizes in the video may be two back ends, not two copies of one page.
 
 In my own captures, every search snippet was 201 to 204 characters. I never saw a long one. So I can confirm the short snapshot. I cannot confirm the long one, and I am not sure it still works the way the video describes. Details in [02-research-notes.md](02-research-notes.md#the-snapshot-and-its-two-sizes).
+
+The later research added one more possibility. A study of ChatGPT's retrieval side describes a separate cache that keeps full copies of pages the system has already read. If that is right, the short text is the search snippet and the long text lives in a different layer, which would explain why I only ever saw the short one in the search results. See [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md#4-the-search-index-and-the-page-cache).

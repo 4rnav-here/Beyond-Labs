@@ -5,16 +5,14 @@ A Chrome extension that captures the response while an assistant is answering, p
 ## Install
 
 1. Open `chrome://extensions` and turn on Developer mode.
-2. Click "Load unpacked" and pick the `extension/` folder. That is the folder with `manifest.json` in it, not the repo root.
+2. Click "Load unpacked" and pick the `fanout-capture/extension/` folder. That is the folder with `manifest.json` in it, not the repo root.
 3. Reload any open ChatGPT or Gemini tab. The hook has to load before the page does.
 4. Click the extension icon. A side panel opens.
 5. Ask something that needs a web search. The capture appears when the answer finishes.
 
 ## What the side panel shows
 
-| ChatGPT capture | Gemini capture |
-|---|---|
-| ![Side panel showing a ChatGPT capture](img/panel-chatgpt.png) | ![Side panel showing a Gemini capture](img/panel-gemini.png) |
+Screenshots of a ChatGPT capture and a Gemini capture are in [Fan-Out-Image.pdf](../Fan-Out-Image.pdf).
 
 - The prompt, with three counts: fan-out queries, sources retrieved, sources cited
 - A warning when the answer was personalised from past chats
@@ -56,6 +54,14 @@ panel.html / .js     shows it
 
 Sites covered: chatgpt.com, gemini.google.com, claude.ai, www.perplexity.ai, grok.com.
 
+## What the extension can and cannot tell you
+
+The extension records what the assistant's server sent to the page. That covers the queries, the results, the snapshots and the citations.
+
+It cannot see anything that stays on the server: why the model chose those query words, how results were ranked, how much of a page the model was actually given, or whether a result came from a stored copy or a fresh fetch. A missing piece in a capture can mean it did not happen, or only that it was not sent to the browser.
+
+So the extension gives the facts, and [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md) gives the explanation that sits on top of them.
+
 ## Privacy
 
 - Nothing leaves the browser. There is no server.
@@ -66,6 +72,7 @@ Sites covered: chatgpt.com, gemini.google.com, claude.ai, www.perplexity.ai, gro
 
 The same parser runs without the browser:
 
+    cd fanout-capture
     node cli/parse.js saved-stream.txt                # JSON
     node cli/parse.js saved-stream.txt --csv          # one row per source
     node cli/parse.js saved-stream.txt gemini         # force a reader

@@ -10,17 +10,24 @@ I would rather be clear about what this project does not show than have someone 
 - Web search and Reddit arrive as separate channels.
 - Logged-in answers can be personalised from past chats before the search runs.
 - Gemini's response for a shopping question is built around Google Shopping product records.
+- "Learning", "memory", "prompt cache" and "search cache" are separate mechanisms. OpenAI documents the first three to different degrees, and the prompt cache holds no web content.
 - The extension captures ChatGPT and Gemini responses live.
 
 ## What I am not confident about
 
 **Sample size.** Three ChatGPT runs and one Gemini run. All on one account, in one evening, about one topic. The three ChatGPT runs were in the same conversation. Every pattern I describe needs many more runs before I would call it a rule.
 
-**Only one search query per answer.** I do not know whether that is because I was in instant mode, because the question was simple, or because more queries run on the server and are not sent to the browser. I did not test thinking mode.
+**How many search queries per answer.** My three recorded runs sent one each. A later attempt sent two, but I only kept the query strings, not a full capture. So I know more than one is possible on my account. I do not know what decides it: the mode, the wording, or the conversation so far. I did not test thinking mode.
+
+**Why those brands.** The brand names appeared before any search ran, so they did not come from results. I believe they come from the model's training, and an independent study found the same pattern in 28.6% of buying-question runs. But I cannot see inside the model. I cannot say why Featherlite and Green Soul were picked over other brands, or why the third brand changed.
+
+**Where Zodiac Pro came from.** It appeared in the second query of the two-query run and not in the first. It may have come from the model or from the first query's results. The query text cannot settle it.
+
+**The explanation rests on other people's work.** Everything in [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md) beyond my own captures comes from OpenAI's documentation or from independent studies. Three of the sources were opened and checked directly: OpenAI's prompt caching guide, the Ahrefs fan-out study and the Radyant study. The others could not be re-opened, and [09-references.md](09-references.md) marks which. The prompt cache details are documented for the API, and I am assuming the app is similar.
 
 **The long snapshot.** The Loom video describes a second snapshot of about 1,000 characters. I never saw one. All 23 of mine were about 200 characters. Others have measured long snippets on a different search back end, so it may depend on the account or the country.
 
-**Whether the snapshot is a stored copy.** The same page gave identical text in two runs 40 minutes apart. That fits a stored copy but does not prove it.
+**Whether the snapshot is a stored copy.** The same page gave identical text in two runs 40 minutes apart. That fits a stored copy but does not prove it. A study of the retrieval side reports a cache of fetched pages, which would explain it, but that is an outside finding and not something OpenAI has confirmed.
 
 **What the model actually read.** The browser gets 200 characters per source. The model may have been given more than that. I can only see what is sent to the page.
 
@@ -48,6 +55,8 @@ I am listing these because they are the kind of mistake anyone doing this will m
 4. **Joining all the answer text.** ChatGPT sends the answer as fragments and also as a merged copy, so I got it twice.
 5. **Trusting the last copy of the source list.** It has no snapshots.
 6. **Counting internal links as outside pages.** The first version of the parser listed ChatGPT's own product-search links as "linked but never retrieved".
+7. **Treating "cache" as one thing.** I asked whether ChatGPT "caches" pages as if there were one cache. There are several, and the one OpenAI documents best (the prompt cache) is not the one that would hold a page snapshot.
+8. **Not saving the two-query run.** The most interesting fan-out I saw is the one I have the least data for.
 
 ## What I would do next
 
@@ -55,18 +64,22 @@ In order:
 
 1. **Run a prompt that returns YouTube videos** and check the YouTube fields. This closes the biggest gap against the task brief.
 2. **Capture logged out or in a temporary chat**, to remove personalisation and conversation context.
-3. **Run the same prompt 10 times in fresh chats** and measure how much the query and the citations change.
-4. **Try thinking mode** and see whether the number of queries goes up.
-5. **Try a free account**, to look for the long snapshot.
-6. **Save a Claude capture** and test its reader.
-7. **Find Gemini's query text**, starting from the place where the "Searching the web" label appears.
-8. **Run Perplexity and Grok.**
-9. **Compare with the official OpenAI API** for the same prompt.
-10. **Check what a snapshot is made from.** Fetch the live page, convert it to text, and see where the 200 characters come from. For YouTube, compare the snapshot with the video description and with the transcript.
-11. **Automate** with a scripted browser, as described in [07-scaling.md](07-scaling.md).
+3. **Run the same prompt 10 times in fresh chats** and measure how much the query and the citations change. In particular, count how often each brand appears in the query. That would show how stable the model's choice of brands is.
+4. **Capture a multi-query run in full.** Record the order of the queries and which results each one returned. That is the only way to tell whether a name in a later query came from the results of an earlier one.
+5. **Test caching with a page I control.** Publish a page with a unique marker, log every request to it, ask ChatGPT about it, change the marker and ask again. The steps and how to read the results are in [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md#how-to-tell-a-cached-page-from-a-fresh-one).
+6. **Turn memory off and on** for the same prompt, to see exactly which query words personal memory adds.
+7. **Try thinking mode** and see whether the number of queries goes up.
+8. **Try a free account**, to look for the long snapshot.
+9. **Save a Claude capture** and test its reader.
+10. **Find Gemini's query text**, starting from the place where the "Searching the web" label appears.
+11. **Run Perplexity and Grok.**
+12. **Compare with the official OpenAI API** for the same prompt. The API returns a search trace, and it reports how many prompt tokens were served from the prompt cache, which the app does not show.
+13. **Check what a snapshot is made from.** Fetch the live page, convert it to text, and see where the 200 characters come from. For YouTube, compare the snapshot with the video description and with the transcript.
+14. **Automate** with a scripted browser, so the same prompts can be run many times.
 
 ## Open questions I find interesting
 
 - Why did the two pakkapick.in pages swap between cited and not cited when nothing about them changed?
 - When ChatGPT adds a brand name to the query and that brand's own blog comes back and gets cited, is that a fair result or a loop?
 - ChatGPT and Gemini had one web page in common for the same question. How different are the answers a person gets depending on which assistant they ask?
+- If the brands in a query come from training, a brand that is new or rarely written about starts with a disadvantage before any search happens. How large is that effect, and can a good page overcome it through the search results alone?

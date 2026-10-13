@@ -26,7 +26,7 @@ I got one real capture from Gemini. I looked at Claude by hand. I did not get to
 
 I asked Gemini the same kind of chair question and captured it two ways: by copying the raw response from the Network tab, and with the extension (22:25 IST). The answer was titled "Best Office Chairs Under ₹15,000", so it lines up with ChatGPT run 2.
 
-The extension's output is in `samples/gemini/run-1-chairs.json`. It found 16 links and no queries.
+The extension found 16 links and no queries.
 
 ### The 16 links are two different things
 
@@ -134,7 +134,7 @@ What I know about the format:
 
 There is no Claude sample in this repo yet. The extension has a reader written from the API documentation, and it is untested.
 
-<!-- TODO: add a Claude capture to samples/claude/ and fill in: the query it sent, the number of sources, and whether sources carry snippets. -->
+<!-- TODO: save a Claude capture and fill in: the query it sent, the number of sources, and whether sources carry snippets. -->
 
 One caution: I am describing what reaches the browser. Claude may do more on its servers that is never sent to the page.
 
@@ -174,4 +174,8 @@ Yes, with one capture method and a separate reader per assistant.
 - **Capture** is the same everywhere. The extension copies the response as it streams. It worked for me on ChatGPT and Gemini. It is set up for Claude, Perplexity and Grok too, but I have not run it there.
 - **Reading** is different everywhere. ChatGPT's reader works. Gemini's reader gets links and products but not queries. The other three are first guesses.
 
-The working example the task asks for is the ChatGPT one. How I would grow it is in [07-scaling.md](07-scaling.md).
+The working example the task asks for is the ChatGPT one. What I would do to grow it is in [08-limits-and-next-steps.md](08-limits-and-next-steps.md#what-i-would-do-next).
+
+## A note on explaining the differences
+
+[07-how-an-answer-is-made.md](07-how-an-answer-is-made.md) explains ChatGPT's behaviour using OpenAI's documentation and studies of ChatGPT. I have not done the same research for Gemini or Claude. The general ideas carry over: every one of these assistants has a trained model, some form of search, and some form of stored content. The specifics do not. Gemini leaning on Google Shopping records is a product decision about which search to run, and I should not read ChatGPT's mechanisms into it.

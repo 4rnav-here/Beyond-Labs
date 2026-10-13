@@ -4,6 +4,9 @@ A Chrome extension that shows what an AI assistant actually searched for behind 
 the fan-out queries, every source it retrieved (URL, title, date, snapshot snippet), and which
 of those it cited. Data stays in your browser.
 
+This folder is the tool. What it found, and the explanation of why assistants search the way they
+do, is in the [main README](../README.md) and the [docs](../docs/).
+
 ## Install
 
 1. Open `chrome://extensions`, turn on **Developer mode**.
@@ -17,8 +20,9 @@ of those it cited. Data stays in your browser.
 |---|---|
 | ChatGPT parser | Tested on a real captured stream: 1 query, 10 retrieved, 4 cited |
 | Capture hook, storage, side panel | Tested in Chromium against a stand-in chatgpt.com page replaying that stream |
-| Live chatgpt.com capture | Not tested here (no access from the build machine) |
-| Perplexity, Claude, Gemini, Grok readers | Written from public write-ups, not tested on live traffic |
+| Live chatgpt.com capture | Used for two of the three recorded ChatGPT runs |
+| Live gemini.google.com capture | Captured one answer. Links and products found, queries not found |
+| Perplexity, Claude, Grok readers | Written from public write-ups, not tested on live traffic |
 | YouTube snippet fields | Pattern taken from the LinkedIn post; no YouTube source in the test capture |
 
 ## How it works
@@ -51,3 +55,6 @@ of those it cited. Data stays in your browser.
 - If ChatGPT resumes a stream over a WebSocket, that part is not captured.
 - Field names change often. The raw stream is stored so old captures can be re-parsed after a fix.
 - Logged-in answers can be personalised from chat history; the panel flags this.
+- The extension sees only what is sent to the page. It cannot show why the model chose its query
+  words or whether a source came from a stored copy. See
+  [docs/07-how-an-answer-is-made.md](../docs/07-how-an-answer-is-made.md).

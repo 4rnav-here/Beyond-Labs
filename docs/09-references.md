@@ -16,6 +16,22 @@ A note on trust: apart from the official documentation, most of this is written 
 - Chrome DevTools, Network panel. How to inspect a request's payload and response. https://developer.chrome.com/docs/devtools/network
 - Anthropic, streaming responses. The typed-block format. https://platform.claude.com/docs/en/api/streaming
 
+## How ChatGPT learns, remembers and caches
+
+These are the sources behind [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md). They came out of a research conversation with ChatGPT. Because an assistant can cite a page loosely, each one was opened where possible. "Checked" means the page was opened and the claim I use is there. "Not re-checked" means the page exists but I could not open it, so the claim rests on the research summary and on search results.
+
+| Source | Used for | Status |
+|---|---|---|
+| OpenAI, "Prompt caching" (API guide). https://developers.openai.com/api/docs/guides/prompt-caching | What the prompt cache stores, exact prefix matching, 1,024-token minimum, per-machine storage, 30-minute lifetime | Checked |
+| Ahrefs, "How ChatGPT Does Query Fan-Out (15 Million Queries Studied)", 12 October 2026. https://ahrefs.com/blog/query-fan-out-chatgpt/ | 66.6 million logged-out responses, 14.4% searched, about 1.6 queries each, growth of "official" and "price" | Checked |
+| Radyant, "Does ChatGPT decide before it searches?", 20 August 2026. https://www.radyant.io/research/chatgpt-fanout-branded-search-queries | 28.6% of opening queries named a vendor, brands in answers without a matching query, day-to-day variation. One week, one engine, 21 accounts | Checked |
+| OpenAI Help Center, "Searching the web with ChatGPT". https://help.openai.com/en/articles/9237897-searching-the-web-with-chatgpt | Prompts rewritten into one or more targeted queries, follow-up queries after first results | Not re-checked |
+| OpenAI Help Center, "Memory in ChatGPT". https://help.openai.com/en/articles/8590148-memory-in-chatgpt | Saved memories and past chats, memories shaping search queries | Not re-checked. The points I use appear in search results for the page |
+| OpenAI, "Dreaming: Better memory for a more helpful ChatGPT", June 2026. https://openai.com/index/chatgpt-memory-dreaming/ | Background process that keeps memory current | Not re-checked. Confirmed through news coverage |
+| Search Engine Land, "Inside ChatGPT's retrieval stack: The index, cache, and pages it actually reads" (RESONEO study). https://searchengineland.com/chatgpt-retrieval-stack-index-cache-pages-485036 | Three layers: discovery index, reading cache, pages opened live. 1,200 answers, 88,000 results, 26,900 pages | Partly. The layers and sample sizes are confirmed. The Markdown conversion and the 30-minute refresh are not re-checked |
+| "Category-conditioned Web Exposure Tracks Brand Presence in ChatGPT Fanout Queries" (preprint, cited as SSRN 7524682) | A model can know a brand and still leave it out of the first query, because a query has room for few names | Not found under that title. A Research Square preprint makes the same argument. I use it only as a suggestion |
+| OpenAI, "Retrieval" and "Conversation state" (API guides). https://developers.openai.com/api/docs/guides/retrieval and https://developers.openai.com/api/docs/guides/conversation-state | General background on retrieval and on how earlier turns are carried forward. Not about ChatGPT's web search | Not re-checked |
+
 ## How ChatGPT search works (reverse-engineering write-ups)
 
 - Peec AI, "ChatGPT built its own search index". Back ends, the index, ranking stages. https://peec.ai/blog/chatgpt-built-its-own-search-index

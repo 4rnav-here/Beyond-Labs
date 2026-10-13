@@ -10,7 +10,7 @@ I ran three prompts on 9 October 2026. All three were about the same thing on pu
 | Run 2 | Find the best chairs under 15k in india | With the extension | 21:51 |
 | Run 3 | Find the best chairs under 10k in india | With the extension | 22:03 |
 
-The parsed output for each run is in `samples/chatgpt/`.
+This page is the record of what I saw. Why the queries look the way they do is on a separate page, [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md), and I link to it where an observation needs explaining.
 
 Two things to know before reading the numbers:
 
@@ -52,8 +52,8 @@ What the rewrite does, every time:
 | (nothing in run 1) | India | Added by the model in run 1. I typed it myself in runs 2 and 3 |
 | (nothing) | 2026 | Added every time, to get current pages |
 | (nothing) | reviews, pricing / price | Added every time. It tells the search what kind of page is wanted |
-| (nothing) | Featherlite, Green Soul | Added every time, before any search had run. These come from the model's own knowledge |
-| (nothing) | Sleep Company (run 1), Wakefit (run 3) | A third brand that changes between runs |
+| (nothing) | Featherlite, Green Soul | Added every time, before any search had run. They cannot have come from search results, so the likely source is what the model learned in training |
+| (nothing) | Sleep Company (run 1), Wakefit (run 3) | A third brand that changes between runs. So the list is written fresh each time, not read from a fixed store |
 
 So the query follows a fixed pattern: **best + category + budget + country + year + intent words + brands**. This matches what Peec AI found across 5 million fan-out queries: ChatGPT stays close to the intent but adds brand names and words like "best" and "reviews".
 
@@ -63,7 +63,24 @@ So the query follows a fixed pattern: **best + category + budget + country + yea
 - More queries might run on the server without being sent to the browser. I cannot rule this out from the browser side.
 - A simple shopping question may just not need more than one search.
 
-The public average for ChatGPT is 2.1 queries per prompt, so one is not unusual.
+The public averages for ChatGPT are 2.1 queries per prompt in one study and about 1.6 in another, so one is not unusual.
+
+### A later run with two queries
+
+After these three runs I tried the prompt "Best chairs under 15k" again and this time ChatGPT sent two queries. I have the query strings but no parsed capture of the sources, so this run is not counted anywhere else on this page.
+
+| | Query |
+|---|---|
+| A | `best ergonomic office chairs under ₹15000 India 2026 Featherlite Amaze Green Soul Jupiter Pro reviews price` |
+| B | `Green Soul Jupiter Pro official product price specifications India; Featherlite Amaze official price specifications India; Green Soul Zodiac Pro chair India 2026` |
+
+What is different from the three runs above:
+
+- **Query A names products, not only brands.** "Featherlite Amaze" and "Green Soul Jupiter Pro" in place of "Featherlite" and "Green Soul".
+- **Query B has a different job.** A looks for comparisons and reviews. B asks for the official price and specifications of specific products. It reads like three small lookups joined by semicolons.
+- **Query B introduces a product that is not in A.** Green Soul Zodiac Pro. I cannot tell from the text whether the model added it on its own or picked it up from the results of query A. A page titled "Green Soul Zodiac Pro vs Featherlite Amaze vs Frido AeroMesh" was among the results of run 2, so the name is certainly out there for this kind of search.
+
+This is the behaviour OpenAI describes for ChatGPT search: one or more targeted queries, with more specific ones possible after the first results. I look at why a prompt gets split like this in [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md#why-one-prompt-can-become-two-queries).
 
 ### Other lookups that are not search queries
 
@@ -73,7 +90,7 @@ The public average for ChatGPT is 2.1 queries per prompt, so one is not unusual.
 
 ## Task 1: citation snapshots
 
-For each source the response gives: URL, title, site name, publish date (when known), a reference number, the channel it came from, and a text snapshot. Full URLs and snapshot text are in the JSON files.
+For each source the response gives: URL, title, site name, publish date (when known), a reference number, the channel it came from, and a text snapshot. The tables below shorten long titles.
 
 ### Run 1: "Find the best chairs under 10k"
 
@@ -148,7 +165,7 @@ Some examples, exactly as they arrived:
 
 **4. The snapshot does not always start at the top of the page.** In my first run I thought it did, because several started with menus and breadcrumbs (pakkapick.in, featherlitestore.com, flipkart.com). The later runs showed otherwise. The vaishaktalks.com snapshot starts mid-article, and the productscanner.in one starts at its summary table. So some selection is happening, but I cannot say how.
 
-**5. The same page gave the same snapshot twice.** Four URLs appeared in both run 1 and run 3, about 40 minutes apart. All four had identical snapshot text. That fits the idea of a stored copy. It is not proof, because a live fetch of an unchanged page would give the same text.
+**5. The same page gave the same snapshot twice.** Four URLs appeared in both run 1 and run 3, about 40 minutes apart. All four had identical snapshot text. That fits the idea of a stored copy. It is not proof, because a live fetch of an unchanged page would give the same text. If there is a stored copy, it belongs to the search system. It is not the prompt cache that OpenAI documents for its API, which stores no page content at all. The difference, and a test that could settle it, are in [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md#how-to-tell-a-cached-page-from-a-fresh-one).
 
 **6. A snapshot can be useless and the page still gets retrieved.** The team-bhp.com snapshot is nothing but page numbers from a forum thread. It was retrieved and not cited.
 
@@ -182,7 +199,7 @@ Some examples, exactly as they arrived:
 
 The two pakkapick.in pages swapped. Same site, same snapshots, opposite outcome. So a single run is not enough to say a page "gets cited".
 
-**Naming a brand in the query pulled in that brand's own pages.** The run 2 query named Green Soul. Four of the eight web results were from greensoul.online, and three of those were cited, including Green Soul's own "best office chair under Rs 15,000" blog post. The brand name was added by ChatGPT, not by me.
+**Naming a brand in the query pulled in that brand's own pages.** The run 2 query named Green Soul. Four of the eight web results were from greensoul.online, and three of those were cited, including Green Soul's own "best office chair under Rs 15,000" blog post. The brand name was added by ChatGPT, not by me. So a choice the model made from its own learned associations, before searching, decided a good part of what the search returned.
 
 **Reddit is its own channel.** Reddit results are tagged `reddit`, not `search`, and are numbered after the web results. Six of the seven threads came from one subreddit, r/ErgonomicIndia.
 
@@ -192,7 +209,7 @@ The two pakkapick.in pages swapped. Same site, same snapshots, opposite outcome.
 
 Run 1 started with a personalisation step. The response lists two of my past chats as context, each tagged with `category: "memory"` and `attribution: "Past chat"`. The turn was labelled "personal context" instead of "shopping".
 
-I never typed "India" or "office" in run 1, yet both are in the search query, and the answer talks about "long coding and desk-work sessions". The response shows that the past chats were made available to the model. It does not prove they caused those words to be added, but it is the obvious explanation.
+I never typed "India" or "office" in run 1, yet both are in the search query, and the answer talks about "long coding and desk-work sessions". The response shows that the past chats were made available to the model. It does not prove they caused those words to be added, but it is the obvious explanation. OpenAI's documentation says memory can be used to shape the search queries ChatGPT sends, so this is the system working as described.
 
 For anyone measuring fan-out queries this matters a lot. A logged-in account with history will not give the same queries as a fresh one. Runs 2 and 3 did not repeat the personalisation step, but they were in the same conversation, so they are not clean either.
 
@@ -201,4 +218,5 @@ For anyone measuring fan-out queries this matters a lot. A logged-in account wit
 - Three runs, one account, one conversation, one evening. These are leads to test, not rules.
 - "Retrieved" means the source was listed in the response. It does not prove the model read the whole page.
 - "Cited" means a citation tag pointed to it. A page can shape an answer without being cited.
-- Runs 2 and 3 were parsed by the first version of the extension. Their JSON files list a few internal chatgpt.com links under "links not retrieved". That was a parser bug and is fixed.
+- The capture shows what happened, not why. Where this page says where something "came from", that is my reading, supported by the sources in [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md).
+- Runs 2 and 3 were parsed by the first version of the extension. Its output listed a few internal chatgpt.com links under "links not retrieved". That was a parser bug and is fixed.

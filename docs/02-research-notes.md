@@ -8,6 +8,8 @@ This is what I learned before and while building. It has three kinds of source:
 
 Full links are in [09-references.md](09-references.md).
 
+This page is about the search side: the tool, the queries, the back ends, the format. The wider picture, how the model learned what it knows, what it remembers about a user and what is cached where, is in [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md).
+
 ## Contents
 
 - [What the official sources say](#what-the-official-sources-say)
@@ -61,13 +63,13 @@ The API is not the app, though. It has no chat history, and it may not use the s
 
 Metasearch widens the **back ends**. Fan-out widens the **queries**. They are different things and a system can do both.
 
-**My captures:** what I saw from ChatGPT was the first kind only: one rewritten, expanded query per answer. Not decomposition, and not several queries. The public reports of many queries per answer are mostly from "thinking" mode, which does the iterative kind.
+**My captures:** in the three recorded runs I saw the first kind only: one rewritten, expanded query per answer. In a later attempt I saw two queries for one prompt, a broad one and a narrower one about official prices and specifications. That is decomposition, possibly with some iterative retrieval, and it is described in [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md#why-one-prompt-can-become-two-queries). The public reports of many queries per answer are mostly from "thinking" mode.
 
 ## The search pipeline
 
 Putting the sources together, a ChatGPT web search goes roughly like this:
 
-1. **Decide whether to search.** Simple questions are answered from memory with no search.
+1. **Decide whether to search.** Simple questions are answered from what the model learned in training, with no search.
 2. **Personalise (logged-in only).** The model can look at saved memory and past chats before it searches.
 3. **Rewrite the prompt into search queries.** This is the fan-out. The model does not search with your words.
 4. **Retrieve.** The queries go to several search back ends. Each result comes back with a title, URL, date and a text snippet.
@@ -99,7 +101,11 @@ Source: Peec AI's analysis of 5 million fan-out queries (April 2026).
 
 Other researchers noted ChatGPT appending source-type hints such as "official" to fact queries.
 
-**My captures:** this matched closely. All three of my ChatGPT queries added "ergonomic office", "reviews", "pricing" or "price", the year, and two or three brand names I never typed.
+A newer and much larger study from Ahrefs (October 2026) looked at 66.6 million logged-out ChatGPT responses and 15 million fan-out queries. It found 14.4% of responses triggered a search, with about 1.6 queries per searched response. Between August and September the word "official" rose from 10.1% to 13.1% of English fan-out queries, and "price" from 6.0% to 8.9%. The two averages (2.1 and 1.6) come from different samples and models, so I read them as "usually one or two", not as a contradiction.
+
+OpenAI's own help page says the same thing in general terms: a prompt is usually rewritten into one or more targeted queries, and more specific ones can follow once the first results are in.
+
+**My captures:** this matched closely. All three of my ChatGPT queries added "ergonomic office", "reviews", "pricing" or "price", the year, and two or three brand names I never typed. The second query in my later two-query run used "official", "price" and "specifications", which is exactly the vocabulary Ahrefs saw growing. Where the brand names come from is covered in [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md#where-the-brand-names-come-from).
 
 ## Where results come from
 
@@ -145,7 +151,9 @@ What the posts say:
 
 Only the third is "ChatGPT keeps two snapshots of every page". I found no evidence for that one.
 
-My conclusion: the short snapshot is real. The long one is reported by others but I could not reproduce it, and I found nothing official. It may depend on account type or country, or it may have changed since.
+A later Search Engine Land article on a RESONEO study (1,200 answers, 88,000 search results, 26,900 distinct pages) gives some support to the second and third readings together. It describes three layers: a discovery index that finds pages, a reading cache that keeps full copies of pages already fetched, and a small set of pages opened live. On that picture the long text is not a second snippet. It is the stored full page, which the model reaches only when it reads a result.
+
+My conclusion: the short snapshot is real. The long one is reported by others but I could not reproduce it, and I found nothing official. It may depend on account type or country, it may have changed since, or it may sit in a layer that is not sent with the search results.
 
 ## Which cache are we talking about
 
@@ -158,6 +166,8 @@ My conclusion: the short snapshot is real. The long one is reported by others bu
 | The search system's own store | On OpenAI's or its providers' servers. Holds page text collected in advance | No. Only its output is visible, as the `snippet` |
 
 The video's "snapshot" is the third kind. From the browser I can see what comes out of it. I cannot see how or when it was filled.
+
+There are two more server-side things that get called a cache or a memory and have nothing to do with web pages: the prompt cache, which reuses calculation for a repeated prompt, and personal memory, which holds what ChatGPT knows about the user. I separate all of these in [07-how-an-answer-is-made.md](07-how-an-answer-is-made.md#four-things-that-all-get-called-memory-or-cache).
 
 ## YouTube
 
